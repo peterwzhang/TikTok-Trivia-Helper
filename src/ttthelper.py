@@ -3,7 +3,9 @@ import pyautogui
 import pytesseract
 import requests
 import time
-
+import os
+import openai
+openai.api_key = os.getenv('OPENAI_API_KEY')
 GOOGLE_SEARCH_URL = 'https://www.google.com/search?q='
 TIMER_POSITION = (390, 575)
 TIMER_COLOR = (125, 249, 175, 255)
@@ -36,10 +38,17 @@ class Question:
     def get_answers(self):
         return self._answers
 
+    def format_answers(self):
+        return '\n'.join(f'{i}. {ans}' for i, ans in enumerate(self._answers, 1))
+
     def print(self):
         print(f'Question {self._number}: {self._question}')
-        for i, a in enumerate(self._answers, 1):
-            print(f'{i}. {a}')
+        print(self.format_answers())
+        # for i, a in enumerate(self._answers, 1):
+        #     print(f'{i}. {a}')
+
+    def get_gpt_prompt(self):
+        return f'{self._question} (pick from the {len(self._answers)} options)\n{self.format_answers()}\nAnswer:'
 
     def print_json(self):
         pass  # TODO: implement this
@@ -70,7 +79,7 @@ def get_question(s, num):
     return Question(question, answers, num)
 
 
-def gen_google_search(q):
+def gen_google_search(q: Question):
     search_url = f'{GOOGLE_SEARCH_URL}{q.get_question()} \
     "{q.get_answer(0)}" OR "{q.get_answer(1)}" OR "{q.get_answer(2)}"'
     search_url = search_url.replace(" ", "+")
@@ -83,7 +92,7 @@ def make_google_soup(url):
     return bs4.BeautifulSoup(r.text, 'lxml')
 
 
-def count_answers(soup, answers):
+def count_answers(soup: bs4.BeautifulSoup, answers):
     results = dict.fromkeys(answers, 0)
     items = soup.find_all('div')
     for item in items:
@@ -95,10 +104,17 @@ def count_answers(soup, answers):
     return results
 
 
-def get_answer_counts(q):
+def get_answer_counts(q: Question):
     search = gen_google_search(q)
     soup = make_google_soup(search)
     return count_answers(soup, q.get_answers())
+
+
+def get_gpt3_ans(q: Question):
+    response = openai.Completion.create(
+        model="text-davinci-003", prompt=q.get_gpt_prompt(), temperature=0, max_tokens=256, top_p=0.2)
+    # print(response)
+    return response['choices'][0]['text']  # type: ignore
 
 
 def run():
@@ -108,12 +124,12 @@ def run():
         if detect_color(TIMER_COLOR, *TIMER_POSITION):
             img = get_game_img(QUESTION_REGION)
             screen_text = get_text(img)
-            q = get_question(screen_text, len(q_list) + 1)
-            results = get_answer_counts(q)
-            q.print()
+            question = get_question(screen_text, len(q_list) + 1)
+            results = get_answer_counts(question)
+            question.print()
             print(results)
             print('waiting for question...\n')
-            q_list.append(q)
+            q_list.append(question)
             time.sleep(QUESTION_TIME)
         else:
             time.sleep(CHECK_SECONDS)
@@ -121,6 +137,11 @@ def run():
 
 def main():
     run()
+    # print('test')
+    # if openai.api_key:
+    #     test = Question("In which sport could you achieve a hole in one?", [
+    #         "Rowing", "Archery", "Golf"], 2)
+    #     print(get_gpt3_ans(test))
 
 
 if __name__ == "__main__":
