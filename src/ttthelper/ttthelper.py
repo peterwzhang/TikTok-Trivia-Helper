@@ -109,7 +109,7 @@ def run():
             img = get_game_img(QUESTION_REGION)
             screen_text = get_text(img)
             q = get_question(screen_text, len(q_list) + 1)
-            results = get_answer_counts
+            results = get_answer_counts(q)
             q.print()
             print(results)
             print('waiting for question...\n')
