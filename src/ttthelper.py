@@ -128,7 +128,8 @@ def run():
             results = get_answer_counts(question)
             question.print()
             print(results)
-            print('waiting for question...\n')
+            print(f'GPT3 Answer:{get_gpt3_ans(question)}')
+            print('\nwaiting for question...\n')
             q_list.append(question)
             time.sleep(QUESTION_TIME)
         else:
@@ -137,11 +138,6 @@ def run():
 
 def main():
     run()
-    # print('test')
-    # if openai.api_key:
-    #     test = Question("In which sport could you achieve a hole in one?", [
-    #         "Rowing", "Archery", "Golf"], 2)
-    #     print(get_gpt3_ans(test))
 
 
 if __name__ == "__main__":
