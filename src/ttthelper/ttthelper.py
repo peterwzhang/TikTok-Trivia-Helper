@@ -42,11 +42,10 @@ class Question:
             print(f'{i}. {a}')
 
     def print_json(self):
-        pass # TODO: implement this
+        pass  # TODO: implement this
 
 
-
-def detect_color(x, y, color):
+def detect_color(color, x, y):
     # (390, 570)
     # (125, 249, 175, 255)
     return pyautogui.pixelMatchesColor(x, y, color, 5)
@@ -81,7 +80,7 @@ def gen_google_search(q):
 def make_google_soup(url):
     r = requests.get(url)
     r.raise_for_status()
-    return bs4.BeautifulSoup(r.text, 'html.parser')
+    return bs4.BeautifulSoup(r.text, 'lxml')
 
 
 def count_answers(soup, answers):
@@ -96,17 +95,21 @@ def count_answers(soup, answers):
     return results
 
 
+def get_answer_counts(q):
+    search = gen_google_search(q)
+    soup = make_google_soup(search)
+    return count_answers(soup, q.get_answers())
+
+
 def run():
     q_list = []
     print('waiting for question...\n')
     while True:
-        if detect_color(*TIMER_POSITION, TIMER_COLOR):
+        if detect_color(TIMER_COLOR, *TIMER_POSITION):
             img = get_game_img(QUESTION_REGION)
             screen_text = get_text(img)
             q = get_question(screen_text, len(q_list) + 1)
-            search = gen_google_search(q)
-            soup = make_google_soup(search)
-            results = count_answers(soup, q.get_answers())
+            results = get_answer_counts
             q.print()
             print(results)
             print('waiting for question...\n')
@@ -115,8 +118,10 @@ def run():
         else:
             time.sleep(CHECK_SECONDS)
 
+
 def main():
     run()
+
 
 if __name__ == "__main__":
     main()
