@@ -1,4 +1,4 @@
-from ttthelper import Question, get_gpt3_ans, get_answer_counts
+from src.ttthelper import Question, get_gpt3_ans, get_answer_counts
 TEST_QUESTIONS = [Question("Which organization did John Wick work for before he retired?", ["United Nations", "CIA", "The Tarasov Mob"], 1),
 
                   Question("In which sport could you achieve a hole in one?", [
@@ -37,10 +37,16 @@ TEST_QUESTIONS = [Question("Which organization did John Wick work for before he 
 def test_google():
     for q in TEST_QUESTIONS:
         q.print()
-        print(f'Google results: {get_answer_counts(q)}')
+        print(f'Google results: {get_answer_counts(q)}\n')
 
 
 def test_gpt():
     for q in TEST_QUESTIONS:
         q.print()
-        print(f'GPT3 Answer:{get_gpt3_ans(q)}')
+        print(f'GPT3 Answer:{get_gpt3_ans(q)}\n')
+
+def main():
+    test_google()
+
+if __name__ == "__main__":
+    main()
