@@ -21,19 +21,35 @@ Once you have the items listed above, follow these instructions below.
 
 1. Clone the repo: `$ git clone https://github.com/peterwzhang/TikTok-Trivia-Helper.git`
 2. Enter the newly created directory `$ cd TikTok-Trivia-Helper`
-3. Create a venv: `$ python3 -m venv ./venv`
+3. Create a venv: `$ python -m venv ./venv`
 4. (Optional) Open `./venv/bin/activate` and add `export OPENAI_API_KEY=PASTE YOUR API KEY HERE` to the end of the file
 5. Activate venv: `$ source ./venv/bin/activate`
 6. Install requirements: `$ pip install -r requirements.txt`
-7. Take a screenshot of your your entire screen while a trivia question is being shown with the green timer bar. You will need this to change some values in `ttthelper.py`.
+7. Take a screenshot of your entire primary screen while a trivia question is being shown with the green timer progress bar. You will need this to change some values in `ttthelper.py`.
     - For `TIMER_POSITION` pick any coordinate (x, y) near the center of the timer.
+    - For `TIMER_COLOR` get the (R, G, B) values at the point for `TIMER_POSITION`
     - For `QUESTION_REGION` get the coordinate (x,y) of the top-left, width, height of the question and answer box. Then use this format (x, y, width, height)
-8. Run TikTok Trivia Helper: `$ python3 ./src/ttthelper.py`
+8. Run TikTok Trivia Helper: `$ python -m src.ttthelper`
+   - To stop the program, press `Ctrl + C` in the terminal
+
+### Windows Instructions
+
+1. Clone the repo: `$ git clone https://github.com/peterwzhang/TikTok-Trivia-Helper.git`
+2. Enter the newly created directory `$ cd TikTok-Trivia-Helper`
+3. Create a venv: `$ python -m venv ./venv`
+4. (Optional) Open `./venv/Scripts/Activate.ps1` and add `$env:OPENAI_API_KEY = 'PASTE YOUR API KEY HERE'` to the end of the file
+5. Activate venv: `$ ./venv/Scripts/Activate.ps1`
+6. Install requirements: `$ pip install -r requirements.txt`
+7. Take a screenshot of your entire primary screen while a trivia question is being shown with the green timer progress bar. You will need this to change some values in `ttthelper.py`.
+    - For `TIMER_POSITION` pick any coordinate (x, y) near the center of the timer.
+    - For `TIMER_COLOR` get the (R, G, B) values at the point for `TIMER_POSITION`
+    - For `QUESTION_REGION` get the coordinate (x,y) of the top-left, width, height of the question and answer box. Then use this format (x, y, width, height)
+8. Run TikTok Trivia Helper: `$ python -m src.ttthelper`
    - To stop the program, press `Ctrl + C` in the terminal
 
 ## Preview
 
-<img width="563" alt="image" src="https://user-images.githubusercontent.com/46033793/221343274-bb62b2e5-5cab-4418-9972-662bb3859bc4.png">
+<img width="563" alt="terminal display" src="https://user-images.githubusercontent.com/46033793/221343274-bb62b2e5-5cab-4418-9972-662bb3859bc4.png">
 
 
 ## Contributing
