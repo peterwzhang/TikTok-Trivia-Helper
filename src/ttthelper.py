@@ -1,4 +1,5 @@
 import bs4
+import concurrent.futures
 import pyautogui
 import pytesseract
 import requests
@@ -114,7 +115,16 @@ def get_gpt3_ans(q: Question):
     response = openai.Completion.create(
         model="text-davinci-003", prompt=q.get_gpt_prompt(), temperature=0, max_tokens=256, top_p=0.2)
     # print(response)
-    return response['choices'][0]['text']  # type: ignore
+    return response['choices'][0]['text']
+
+
+def get_all_answers(q: Question):
+    with concurrent.futures.ThreadPoolExecutor() as executor:
+        f1 = executor.submit(get_answer_counts, q)
+        f2 = executor.submit(get_gpt3_ans, q)
+
+    print(f'Google results: {f1.result()}')
+    print(f'GPT3 answer:{f2.result()}')
 
 
 def run():
@@ -125,10 +135,12 @@ def run():
             img = get_game_img(QUESTION_REGION)
             screen_text = get_text(img)
             question = get_question(screen_text, len(q_list) + 1)
-            results = get_answer_counts(question)
             question.print()
-            print(results)
-            print(f'GPT3 Answer:{get_gpt3_ans(question)}')
+            if openai.api_key:
+                get_all_answers(question)
+            else:
+                results = get_answer_counts(question)
+                print(f'Google results: {results}')
             print('\nwaiting for question...\n')
             q_list.append(question)
             time.sleep(QUESTION_TIME)
