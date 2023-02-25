@@ -1,3 +1,4 @@
+import string
 import bs4
 import concurrent.futures
 import pyautogui
@@ -92,6 +93,8 @@ def make_google_soup(url):
     r.raise_for_status()
     return bs4.BeautifulSoup(r.text, 'lxml')
 
+def rem_punc(input_string):
+    return input_string.translate(str.maketrans('', '', string.punctuation))
 
 def count_answers(soup: bs4.BeautifulSoup, answers):
     results = dict.fromkeys(answers, 0)
@@ -100,7 +103,9 @@ def count_answers(soup: bs4.BeautifulSoup, answers):
         #  print(i)
         for i in range(3):
             text = item.get_text().lower()
-            if answers[i].lower() in text:
+            text_no_punc = rem_punc(text)
+            ans_l = answers[i].lower()
+            if ans_l in text or ans_l in text_no_punc:
                 results[answers[i]] += 1
     return results
 
