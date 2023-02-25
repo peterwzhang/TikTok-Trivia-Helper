@@ -31,6 +31,11 @@ Once you have the items listed above, follow these instructions below.
 8. Run TikTok Trivia Helper: `$ python3 ./src/ttthelper.py`
    - To stop the program, press `Ctrl + C` in the terminal
 
+## Preview
+
+<img width="563" alt="image" src="https://user-images.githubusercontent.com/46033793/221343274-bb62b2e5-5cab-4418-9972-662bb3859bc4.png">
+
+
 ## Contributing
 
 If you would like to contribute, please create/find an issue then assign yourself and link a pull request to the issue.
