@@ -46,8 +46,6 @@ class Question:
     def print(self):
         print(f'Question {self._number}: {self._question}')
         print(self.format_answers())
-        # for i, a in enumerate(self._answers, 1):
-        #     print(f'{i}. {a}')
 
     def get_gpt_prompt(self):
         return f'{self._question} (pick from the {len(self._answers)} options)\n{self.format_answers()}\nAnswer:'
@@ -57,13 +55,10 @@ class Question:
 
 
 def detect_color(color, x, y):
-    # (390, 570)
-    # (125, 249, 175, 255)
     return pyautogui.pixelMatchesColor(x, y, color, 5)
 
 
 def get_game_img(img_region):
-    # (75,675, 650, 650)
     screenshot = pyautogui.screenshot(region=img_region)
     return screenshot
 
@@ -93,14 +88,15 @@ def make_google_soup(url):
     r.raise_for_status()
     return bs4.BeautifulSoup(r.text, 'lxml')
 
+
 def rem_punc(input_string):
     return input_string.translate(str.maketrans('', '', string.punctuation))
+
 
 def count_answers(soup: bs4.BeautifulSoup, answers):
     results = dict.fromkeys(answers, 0)
     items = soup.find_all('div')
     for item in items:
-        #  print(i)
         for i in range(3):
             text = item.get_text().lower()
             text_no_punc = rem_punc(text)
@@ -144,8 +140,8 @@ def run():
             if openai.api_key:
                 get_all_answers(question)
             else:
-                results = get_answer_counts(question)
-                print(f'Google results: {results}')
+                google_results = get_answer_counts(question)
+                print(f'Google results: {google_results}')
             print('\nwaiting for question...\n')
             q_list.append(question)
             time.sleep(QUESTION_TIME)
