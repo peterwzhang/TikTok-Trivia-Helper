@@ -1,7 +1,10 @@
 import bs4
+import cv2
 import concurrent.futures
 from datetime import datetime
 import json
+import numpy as np
+from PIL import Image
 import pyautogui
 import pytesseract
 import requests
@@ -71,8 +74,32 @@ def get_game_img(img_region):
     return screenshot
 
 
+def process_img(im: Image):
+    np_img = np.array(im)
+    contrast = 0.8
+    brightness = -100
+    img = cv2.addWeighted(np.array(np_img), contrast,
+                          np.array(np_img), 0, brightness)
+
+    return img
+
+
 def get_text(im):
-    return pytesseract.image_to_string(im)
+    img = process_img(im)
+    return pytesseract.image_to_string(img)
+
+
+def show_text_boxes(im):
+
+    d = pytesseract.image_to_data(im, output_type=pytesseract.Output.DICT)
+    n_boxes = len(d['level'])
+    for i in range(n_boxes):
+        (x, y, w, h) = (d['left'][i], d['top']
+                        [i], d['width'][i], d['height'][i])
+        cv2.rectangle(im, (x, y), (x + w, y + h), (0, 255, 0), 2)
+
+    cv2.imshow('img', im)
+    cv2.waitKey(0)
 
 
 def get_question(s, num):

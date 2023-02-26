@@ -1,4 +1,4 @@
-from src.ttthelper import Question, get_gpt3_ans, get_answer_counts
+from src.ttthelper import *
 TEST_QUESTIONS = [Question("Which organization did John Wick work for before he retired?", ["United Nations", "CIA", "The Tarasov Mob"], 1),
 
                   Question("In which sport could you achieve a hole in one?", [
