@@ -19,9 +19,11 @@ NUM_ANSWERS = 3
 QUESTION_TIME = 10
 CHECK_SECONDS = 0.5
 
+
 def sigint_handler(signum, frame):
     global running
     running = False
+
 
 class Question:
     def __init__(self, q='', a=[], num=0):
@@ -133,6 +135,7 @@ def get_all_answers(q: Question):
     print(f'Google results: {f1.result()}')
     print(f'GPT3 answer:{f2.result()}')
 
+
 def log_questions(q_list):
     cur_time = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     log_name = f'log_{cur_time}.json'
@@ -141,6 +144,7 @@ def log_questions(q_list):
     with open(f'logs/{log_name}', 'w') as f:
         json.dump([q.get_json() for q in q_list], f, indent=4)
     print(f'\nSaved questions to {dir}/{log_name}')
+
 
 def run():
     q_list = []
@@ -165,6 +169,7 @@ def run():
         else:
             time.sleep(CHECK_SECONDS)
     log_questions(q_list)
+
 
 def main():
     run()
