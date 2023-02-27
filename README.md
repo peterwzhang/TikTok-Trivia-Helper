@@ -1,8 +1,9 @@
 # TikTok Trivia Helper
 
-This is a program that attempts to find the answers for TikTok Trivia questions using Google and OpenAI's GPT-3. **As of 02/24/23 it has answered all questions correctly (6/6 games).**
+This is a program that attempts to find the answers for TikTok Trivia questions using Google and OpenAI's GPT-3. It also supports sending results to a Discord webhook.
 
-If you're in need of a TikTok Trivia referral code, you can use mine: <https://www.tiktok.com/t/ZTRnuPRKt/> or CI69079018.
+**As of 02/24/23 it has answered all non-video questions correctly (6/6 games).**
+
 
 ## Setup
 
@@ -23,13 +24,14 @@ Once you have the items listed above, follow these instructions below.
 2. Enter the newly created directory `$ cd TikTok-Trivia-Helper`
 3. Create a venv: `$ python -m venv ./venv`
 4. (Optional) Open `./venv/bin/activate` and add `export OPENAI_API_KEY=PASTE YOUR API KEY HERE` to the end of the file
-5. Activate venv: `$ source ./venv/bin/activate`
-6. Install requirements: `$ pip install -r requirements.txt`
-7. Take a screenshot of your entire primary screen while a trivia question is being shown with the green timer progress bar. You will need this to change some values in `ttthelper.py`.
+5. (Optional) in the same file as step 4 add `export DISC_WEBHK_URL=PASTE YOUR DISCORD WEBHOOK URL HERE`
+6. Activate venv: `$ source ./venv/bin/activate`
+7. Install requirements: `$ pip install -r requirements.txt`
+8. Take a screenshot of your entire primary screen while a trivia question is being shown with the green timer progress bar. You will need this to change some values in `ttthelper.py`.
     - For `TIMER_POSITION` pick any coordinate (x, y) near the center of the timer.
-    - For `TIMER_COLOR` get the (R, G, B) values at the point for `TIMER_POSITION`
+    - For `TIMER_COLOR` get the (R, G, B, 255) values at the point for `TIMER_POSITION`
     - For `QUESTION_REGION` get the coordinate (x,y) of the top-left, width, height of the question and answer box. Then use this format (x, y, width, height)
-8. Run TikTok Trivia Helper: `$ python -m src.ttthelper`
+9. Run TikTok Trivia Helper: `$ python -m src.ttthelper`
    - To stop the program, press `Ctrl + C` in the terminal
 
 ### Windows Instructions
@@ -38,19 +40,21 @@ Once you have the items listed above, follow these instructions below.
 2. Enter the newly created directory `$ cd TikTok-Trivia-Helper`
 3. Create a venv: `$ python -m venv ./venv`
 4. (Optional) Open `./venv/Scripts/Activate.ps1` and add `$env:OPENAI_API_KEY = 'PASTE YOUR API KEY HERE'` to the end of the file
-5. Activate venv: `$ ./venv/Scripts/Activate.ps1`
-6. Install requirements: `$ pip install -r requirements.txt`
-7. Take a screenshot of your entire primary screen while a trivia question is being shown with the green timer progress bar. You will need this to change some values in `ttthelper.py`.
+5. (Optional) in the same file as step 4 add `$env:DISC_WEBHK_URL='PASTE YOUR DISCORD WEBHOOK URL HERE'`
+6. Activate venv: `$ ./venv/Scripts/Activate.ps1`
+7. Install requirements: `$ pip install -r requirements.txt`
+8. Take a screenshot of your entire primary screen while a trivia question is being shown with the green timer progress bar. You will need this to change some values in `ttthelper.py`.
     - For `TIMER_POSITION` pick any coordinate (x, y) near the center of the timer.
-    - For `TIMER_COLOR` get the (R, G, B) values at the point for `TIMER_POSITION`
+    - For `TIMER_COLOR` get the (R, G, B, 255) values at the point for `TIMER_POSITION`
     - For `QUESTION_REGION` get the coordinate (x,y) of the top-left, width, height of the question and answer box. Then use this format (x, y, width, height)
-8. Run TikTok Trivia Helper: `$ python -m src.ttthelper`
+9. Run TikTok Trivia Helper: `$ python -m src.ttthelper`
    - To stop the program, press `Ctrl + C` in the terminal
 
 ## Preview
 
-<img width="563" alt="terminal display" src="https://user-images.githubusercontent.com/46033793/221343274-bb62b2e5-5cab-4418-9972-662bb3859bc4.png">
+![embed picture](https://user-images.githubusercontent.com/46033793/221461825-d6627438-7d0d-4de5-9326-191b42d7dbde.png)
 
+<img width="563" alt="terminal display" src="https://user-images.githubusercontent.com/46033793/221343274-bb62b2e5-5cab-4418-9972-662bb3859bc4.png">
 
 ## Contributing
 

@@ -14,10 +14,11 @@ import time
 import os
 import openai
 openai.api_key = os.getenv('OPENAI_API_KEY')
+DISC_WEBHK_URL = os.getenv('DISC_WEBHK_URL')
 GOOGLE_SEARCH_URL = 'https://www.google.com/search?q='
 TIMER_POSITION = (390, 575)
 TIMER_COLOR = (125, 249, 175, 255)
-QUESTION_REGION = (75, 675, 650, 650)
+QUESTION_REGION = (75, 675, 650, 640)
 NUM_ANSWERS = 3
 QUESTION_TIME = 10
 CHECK_SECONDS = 0.5
@@ -40,6 +41,9 @@ class Question:
     def set_answer(self, a):
         self._answers = a
 
+    def set_number(self, n):
+        self._number = n
+
     def get_question(self):
         return self._question
 
@@ -47,6 +51,9 @@ class Question:
         if i < 0 or i >= len(self._answers):
             raise IndexError('Answer Index does not exist')
         return self._answers[i]
+
+    def get_number(self):
+        return self._number
 
     def get_answers(self):
         return self._answers
@@ -74,7 +81,7 @@ def get_game_img(img_region):
     return screenshot
 
 
-def process_img(im: Image):
+def process_img(im: Image.Image):
     np_img = np.array(im)
     contrast = 0.8
     brightness = -100
@@ -105,15 +112,16 @@ def show_text_boxes(im):
 def get_question(s, num):
     split_s = s.split('\n')
     split_s = list(filter(None, split_s))
-    question = ' '.join(split_s[:-3])
+    question = ' '.join(split_s[:-NUM_ANSWERS])
     question.replace('"', '')
+    # assumes the last NUM_ANSWERS lines will always be the answers
     answers = split_s[-NUM_ANSWERS:]
     return Question(question, answers, num)
 
 
 def gen_google_search(q: Question):
-    search_url = f'{GOOGLE_SEARCH_URL}{q.get_question()} \
-    "{q.get_answer(0)}" OR "{q.get_answer(1)}" OR "{q.get_answer(2)}"'
+    f_answers = '\" OR \"'.join(q.get_answers())
+    search_url = f'{GOOGLE_SEARCH_URL}{q.get_question()} "{f_answers}"'
     search_url = search_url.replace(" ", "+")
     return search_url
 
@@ -132,35 +140,49 @@ def count_answers(soup: bs4.BeautifulSoup, answers):
     results = dict.fromkeys(answers, 0)
     items = soup.find_all('div')
     for item in items:
-        for i in range(3):
+        for ans in answers:
             text = item.get_text().lower()
             text_no_punc = rem_punc(text)
-            ans_l = answers[i].lower()
+            ans_l = ans.lower()
             if ans_l in text or ans_l in text_no_punc:
-                results[answers[i]] += 1
+                results[ans] += 1
     return results
 
 
-def get_answer_counts(q: Question):
+def get_google_results(q: Question):
     search = gen_google_search(q)
     soup = make_google_soup(search)
     return count_answers(soup, q.get_answers())
 
 
-def get_gpt3_ans(q: Question):
+def get_gpt3_ans(prompt):
     response = openai.Completion.create(
-        model="text-davinci-003", prompt=q.get_gpt_prompt(), temperature=0, max_tokens=256, top_p=0.2)
+        model="text-davinci-003", prompt=prompt, temperature=0, max_tokens=256, top_p=0.2)
     # print(response)
     return response['choices'][0]['text']
 
 
 def get_all_answers(q: Question):
     with concurrent.futures.ThreadPoolExecutor() as executor:
-        f1 = executor.submit(get_answer_counts, q)
-        f2 = executor.submit(get_gpt3_ans, q)
+        f1 = executor.submit(get_google_results, q)
+        f2 = executor.submit(get_gpt3_ans, q.get_gpt_prompt())
+    return f'Google results: {f1.result()}\nGPT3 answer:{f2.result()}'
 
-    print(f'Google results: {f1.result()}')
-    print(f'GPT3 answer:{f2.result()}')
+
+def create_disc_embed(q: Question, results):
+    ans_choices = '\n'.join(
+        f'{i}. [{ans}]({(GOOGLE_SEARCH_URL + ans).replace(" ", "+")})' for i, ans in enumerate(q.get_answers(), 1))
+    return {'title': f'Question {q.get_number()}: {q.get_question()}', 'url': f'{gen_google_search(q)}', 'description': f'{ans_choices}\n\n**{results}**\n', 'color': 0x000000,
+            'fields': [{"name": 'Support this project on Github!',
+                        'value': '[star project](https://github.com/peterwzhang/TikTok-Trivia-Helper) or [follow](https://github.com/peterwzhang/TikTok-Trivia-Helper)'
+                        }
+                       ]}
+
+
+def post_disc_web_hk(url, q, r):
+    data = {'username': 'TikTok Trivia Helper',
+            'embeds': [create_disc_embed(q, r)]}
+    r = requests.post(url, json=data)
 
 
 def log_questions(q_list):
@@ -168,7 +190,7 @@ def log_questions(q_list):
     log_name = f'log_{cur_time}.json'
     dir = 'logs'
     os.makedirs(dir, exist_ok=True)
-    with open(f'logs/{log_name}', 'w') as f:
+    with open(f'logs/{log_name}', 'w+') as f:
         json.dump([q.get_json() for q in q_list], f, indent=4)
     print(f'\nSaved questions to {dir}/{log_name}')
 
@@ -185,13 +207,17 @@ def run():
             screen_text = get_text(img)
             question = get_question(screen_text, len(q_list) + 1)
             question.print()
+            results = ''
             if openai.api_key:
-                get_all_answers(question)
+                results = get_all_answers(question)
             else:
-                google_results = get_answer_counts(question)
-                print(f'Google results: {google_results}')
-            print('\nwaiting for question...\n')
+                results = f'Google results: {get_google_results(question)}'
+            print(results)
             q_list.append(question)
+            if DISC_WEBHK_URL:
+                post_disc_web_hk(
+                    DISC_WEBHK_URL, question, results)
+            print('\nwaiting for question...\n')
             time.sleep(QUESTION_TIME)
         else:
             time.sleep(CHECK_SECONDS)
