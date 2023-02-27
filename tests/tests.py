@@ -37,7 +37,7 @@ TEST_QUESTIONS = [Question("Which organization did John Wick work for before he 
 def test_google():
     for q in TEST_QUESTIONS:
         q.print()
-        print(f'Google results: {get_answer_counts(q)}\n')
+        print(f'Google results: {get_google_results(q)}\n')
 
 
 def test_gpt():
