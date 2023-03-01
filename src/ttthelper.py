@@ -91,13 +91,12 @@ def process_img(im: Image.Image):
     return img
 
 
-def get_text(im):
+def get_text(im: Image.Image):
     img = process_img(im)
     return pytesseract.image_to_string(img)
 
 
 def show_text_boxes(im):
-
     d = pytesseract.image_to_data(im, output_type=pytesseract.Output.DICT)
     n_boxes = len(d['level'])
     for i in range(n_boxes):
@@ -109,14 +108,14 @@ def show_text_boxes(im):
     cv2.waitKey(0)
 
 
-def get_question(s, num):
+def get_question(s, q_num, num_ans):
     split_s = s.split('\n')
     split_s = list(filter(None, split_s))
-    question = ' '.join(split_s[:-NUM_ANSWERS])
+    question = ' '.join(split_s[:-num_ans])
     question.replace('"', '')
     # assumes the last NUM_ANSWERS lines will always be the answers
-    answers = split_s[-NUM_ANSWERS:]
-    return Question(question, answers, num)
+    answers = split_s[-num_ans:]
+    return Question(question, answers, q_num)
 
 
 def gen_google_search(q: Question):
@@ -205,7 +204,7 @@ def run():
         if detect_color(TIMER_COLOR, *TIMER_POSITION):
             img = get_game_img(QUESTION_REGION)
             screen_text = get_text(img)
-            question = get_question(screen_text, len(q_list) + 1)
+            question = get_question(screen_text, len(q_list) + 1, NUM_ANSWERS)
             question.print()
             results = ''
             if openai.api_key:
