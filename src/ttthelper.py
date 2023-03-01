@@ -154,17 +154,17 @@ def get_google_results(q: Question):
     return count_answers(soup, q.get_answers())
 
 
-def get_gpt3_ans(prompt):
-    response = openai.Completion.create(
-        model="text-davinci-003", prompt=prompt, temperature=0, max_tokens=256, top_p=0.2)
+def get_gpt_ans(prompt):
+    response = openai.ChatCompletion.create(model='gpt-3.5-turbo', messages=[
+                                            {"role": "user", "content": prompt}], temperature=0, max_tokens=256, top_p=0.2)
     # print(response)
-    return response['choices'][0]['text']
+    return response['choices'][0]['message']['content']
 
 
 def get_all_answers(q: Question):
     with concurrent.futures.ThreadPoolExecutor() as executor:
         f1 = executor.submit(get_google_results, q)
-        f2 = executor.submit(get_gpt3_ans, q.get_gpt_prompt())
+        f2 = executor.submit(get_gpt_ans, q.get_gpt_prompt())
     return f'Google results: {f1.result()}\nGPT3 answer:{f2.result()}'
 
 

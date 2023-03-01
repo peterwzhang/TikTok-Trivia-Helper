@@ -43,10 +43,13 @@ def test_google():
 def test_gpt():
     for q in TEST_QUESTIONS:
         q.print()
-        print(f'GPT3 Answer:{get_gpt3_ans(q)}\n')
+        print(f'ChatGPT Answer:{get_gpt_ans(q.get_gpt_prompt())}\n')
+
 
 def main():
     test_google()
+    test_gpt()
+
 
 if __name__ == "__main__":
     main()
