@@ -1,6 +1,6 @@
 # TikTok Trivia Helper
 
-This is a program that attempts to find the answers for TikTok Trivia questions using Google and OpenAI's GPT-3. It also supports sending results to a Discord webhook.
+This is a program that attempts to find the answers for TikTok Trivia questions using Google and OpenAI's ChatGPT. It also supports sending results to a Discord webhook.
 
 **As of 02/24/23 it has answered all non-video questions correctly (6/6 games).**
 
